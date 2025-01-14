@@ -1,6 +1,8 @@
 import * as core from "@actions/core";
+import { App, BlockAction } from "@slack/bolt";
 import {
   Button,
+  LogLevel,
   MrkdwnElement,
   PlainTextElement,
   WebClient,
@@ -10,6 +12,17 @@ const token = process.env.SLACK_BOT_TOKEN || "";
 const channel_id = process.env.SLACK_CHANNEL_ID || "";
 const env = process.env.DEPLOYMENT_ENV || "";
 const workspace = process.env.SLACK_WORKSPACE || "";
+const signingSecret = process.env.SLACK_SIGNING_SECRET || "";
+const slackAppToken = process.env.SLACK_APP_TOKEN || "";
+
+const app = new App({
+  token: token,
+  signingSecret: signingSecret,
+  appToken: slackAppToken,
+  socketMode: true,
+  port: 3000,
+  logLevel: LogLevel.DEBUG,
+});
 
 async function run(): Promise<void> {
   try {
@@ -164,5 +177,60 @@ async function run(): Promise<void> {
     if (error instanceof Error) core.setFailed(error.message);
   }
 }
+
+app.action("slack-approval-approve", async ({ ack, client, body, logger }) => {
+  await ack();
+  try {
+    const response_blocks = (<BlockAction>body).message?.blocks;
+    response_blocks.pop();
+    response_blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `Approved by <@${body.user.id}> `,
+      },
+    });
+
+    await client.chat.update({
+      channel: body.channel?.id || "",
+      ts: (<BlockAction>body).message?.ts || "",
+      blocks: response_blocks,
+    });
+  } catch (error) {
+    logger.error(error);
+  }
+
+  process.exit(0);
+});
+
+app.action("slack-approval-reject", async ({ ack, client, body, logger }) => {
+  await ack();
+  try {
+    const response_blocks = (<BlockAction>body).message?.blocks;
+    response_blocks.pop();
+    response_blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `Rejected by <@${body.user.id}>`,
+      },
+    });
+
+    await client.chat.update({
+      channel: body.channel?.id || "",
+      ts: (<BlockAction>body).message?.ts || "",
+      blocks: response_blocks,
+    });
+  } catch (error) {
+    logger.error(error);
+  }
+
+  process.exit(1);
+});
+
+(async () => {
+  await app.start(3000);
+  console.log("Waiting Approval reaction.....");
+})();
 
 run();
