@@ -174,24 +174,24 @@ async function run(): Promise<void> {
     const ts = response.ts;
     const formattedTs = "p" + ts.split(".").join("");
 
-    timeoutId = setTimeout(() => {
-      console.error(`Timeout of ${timeout}ms exceeded. Exiting process.`);
-      core.error("Timeout Exceeded!  Cancelling build.");
-      core.setFailed("Timeout Exceeded!  Cancelling build.");
-      web.chat.update({
-        ts: ts,
-        channel: channel_id,
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `Request timed out after ${timeoutNumber / 1000} seconds`,
-            },
-          },
-        ],
-      });
-    }, timeoutNumber);
+    // timeoutId = setTimeout(() => {
+    //   console.error(`Timeout of ${timeout}ms exceeded. Exiting process.`);
+    //   core.error("Timeout Exceeded!  Cancelling build.");
+    //   core.setFailed("Timeout Exceeded!  Cancelling build.");
+    //   web.chat.update({
+    //     ts: ts,
+    //     channel: channel_id,
+    //     blocks: [
+    //       {
+    //         type: "section",
+    //         text: {
+    //           type: "mrkdwn",
+    //           text: `Request timed out after ${timeoutNumber / 1000} seconds`,
+    //         },
+    //       },
+    //     ],
+    //   });
+    // }, timeoutNumber);
 
     const slackMessageLink = `https://${workspace}.slack.com/archives/${channel_id}/${formattedTs}`;
 
