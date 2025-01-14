@@ -14,6 +14,8 @@ const env = process.env.DEPLOYMENT_ENV || "";
 const workspace = process.env.SLACK_WORKSPACE || "";
 const signingSecret = process.env.SLACK_SIGNING_SECRET || "";
 const slackAppToken = process.env.SLACK_APP_TOKEN || "";
+const timeout = process.env.TIMEOUT || "15000";
+const timeoutNumber = parseInt(timeout);
 
 const app = new App({
   token: token,
@@ -23,6 +25,12 @@ const app = new App({
   port: 3000,
   logLevel: LogLevel.DEBUG,
 });
+
+const timeoutId = setTimeout(() => {
+  console.error(`Timeout of ${timeout}ms exceeded. Exiting process.`);
+  core.error("Timeout Exceeded!  Cancelling build.");
+  core.setFailed("Timeout Exceeded!  Cancelling build.");
+}, timeoutNumber);
 
 async function run(): Promise<void> {
   try {
@@ -196,6 +204,9 @@ app.action("slack-approval-approve", async ({ ack, client, body, logger }) => {
       ts: (<BlockAction>body).message?.ts || "",
       blocks: response_blocks,
     });
+
+    // Clear the timeout
+    clearTimeout(timeoutId);
   } catch (error) {
     logger.error(error);
   }
@@ -225,6 +236,7 @@ app.action("slack-approval-reject", async ({ ack, client, body, logger }) => {
     logger.error(error);
   }
 
+  clearTimeout(timeoutId);
   process.exit(1);
 });
 
