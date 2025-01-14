@@ -52,7 +52,7 @@ function run() {
             const branch = process.env.GITHUB_REF || "";
             const pr_link = process.env.PR_LINK || undefined;
             const commit_message = process.env.COMMIT_MESSAGE || undefined;
-            const confirmationRequired = process.env.CONFIRMATION === 'true';
+            const confirmationRequired = process.env.CONFIRMATION === "true";
             const sha = process.env.COMMIT_SHA || "";
             const triggerSha = process.env.GITHUB_SHA || "";
             const customId = JSON.stringify({
@@ -109,37 +109,37 @@ function run() {
                 approveButton.confirm = {
                     title: {
                         type: "plain_text",
-                        text: "Are you sure?"
+                        text: "Are you sure?",
                     },
                     text: {
                         type: "mrkdwn",
-                        text: "Do you really want to approve this action?"
+                        text: "Do you really want to approve this action?",
                     },
                     confirm: {
                         type: "plain_text",
-                        text: "Yes, Approve"
+                        text: "Yes, Approve",
                     },
                     deny: {
                         type: "plain_text",
-                        text: "Cancel"
+                        text: "Cancel",
                     },
                 };
                 rejectButton.confirm = {
                     title: {
                         type: "plain_text",
-                        text: "Are you sure?"
+                        text: "Are you sure?",
                     },
                     text: {
                         type: "mrkdwn",
-                        text: "Do you really want to reject this action?"
+                        text: "Do you really want to reject this action?",
                     },
                     confirm: {
                         type: "plain_text",
-                        text: "Yes, Reject"
+                        text: "Yes, Reject",
                     },
                     deny: {
                         type: "plain_text",
-                        text: "Cancel"
+                        text: "Cancel",
                     },
                 };
             }

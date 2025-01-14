@@ -1,5 +1,11 @@
 import * as core from "@actions/core";
-import { MrkdwnElement, PlainTextElement, WebClient } from "@slack/web-api";
+import {
+  ActionsBlockElement,
+  Button,
+  MrkdwnElement,
+  PlainTextElement,
+  WebClient,
+} from "@slack/web-api";
 
 const token = process.env.SLACK_BOT_TOKEN || "";
 const channel_id = process.env.SLACK_CHANNEL_ID || "";
@@ -20,7 +26,7 @@ async function run(): Promise<void> {
     const branch = process.env.GITHUB_REF || "";
     const pr_link = process.env.PR_LINK || undefined;
     const commit_message = process.env.COMMIT_MESSAGE || undefined;
-    const confirmationRequired = process.env.CONFIRMATION === 'true';
+    const confirmationRequired = process.env.CONFIRMATION === "true";
 
     const sha = process.env.COMMIT_SHA || "";
     const triggerSha = process.env.GITHUB_SHA || "";
@@ -60,7 +66,7 @@ async function run(): Promise<void> {
       { type: "mrkdwn", text: `*RunnerOS:*\n${runnerOS}` }
     );
 
-    const approveButton = {
+    const approveButton: Button = {
       type: "button",
       text: {
         type: "plain_text",
@@ -72,8 +78,8 @@ async function run(): Promise<void> {
       action_id: "slack-approval-approve",
       confirm: undefined,
     };
-    
-    const rejectButton = {
+
+    const rejectButton: Button = {
       type: "button",
       text: {
         type: "plain_text",
@@ -85,47 +91,46 @@ async function run(): Promise<void> {
       action_id: "slack-approval-reject",
       confirm: undefined,
     };
-    
+
     if (confirmationRequired) {
       approveButton.confirm = {
         title: {
           type: "plain_text",
-          text: "Are you sure?"
+          text: "Are you sure?",
         },
         text: {
           type: "mrkdwn",
-          text: "Do you really want to approve this action?"
+          text: "Do you really want to approve this action?",
         },
         confirm: {
           type: "plain_text",
-          text: "Yes, Approve"
+          text: "Yes, Approve",
         },
         deny: {
           type: "plain_text",
-          text: "Cancel"
+          text: "Cancel",
         },
       };
-    
+
       rejectButton.confirm = {
         title: {
           type: "plain_text",
-          text: "Are you sure?"
+          text: "Are you sure?",
         },
         text: {
           type: "mrkdwn",
-          text: "Do you really want to reject this action?"
+          text: "Do you really want to reject this action?",
         },
         confirm: {
           type: "plain_text",
-          text: "Yes, Reject"
+          text: "Yes, Reject",
         },
         deny: {
           type: "plain_text",
-          text: "Cancel"
+          text: "Cancel",
         },
       };
     }
-    
 
     const response = await web.chat.postMessage({
       channel: channel_id,
@@ -149,14 +154,13 @@ async function run(): Promise<void> {
         },
       ],
     });
-    
+
     const ts = response.ts;
     const formattedTs = "p" + ts.split(".").join("");
 
     const slackMessageLink = `https://${workspace}.slack.com/archives/${channel_id}/${formattedTs}`;
 
     core.info(`Direct link to the Slack message: ${slackMessageLink}`);
-
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message);
   }
