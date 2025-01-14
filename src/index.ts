@@ -1,6 +1,5 @@
 import * as core from "@actions/core";
 import {
-  ActionsBlockElement,
   Button,
   MrkdwnElement,
   PlainTextElement,
